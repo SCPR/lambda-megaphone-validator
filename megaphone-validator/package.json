@@ -1,0 +1,25 @@
+{
+  "name": "lambda-megaphone-validator",
+  "version": "1.0.0",
+  "description": "An AWS lambda function that compares the file sizes of recently uploaded audio files with the original files",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SCPR/lambda-megaphone-validator.git"
+  },
+  "author": "Jay Arella",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SCPR/lambda-megaphone-validator/issues"
+  },
+  "homepage": "https://github.com/SCPR/lambda-megaphone-validator#readme",
+  "dependencies": {
+    "dotenv": "^6.2.0",
+    "music-metadata": "^3.5.1",
+    "request": "^2.88.0"
+  }
+}
