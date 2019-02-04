@@ -27,7 +27,7 @@ module.exports = (programSlug) => {
                     const originalAudio = episode.audio[0];
                     const megaphoneEpisode = await searchForMegaphoneEpisodes(externalId);
 
-                    // If there is a megaphone episode
+                    // If there is a megaphone episode, check the difference in duration between both files
                     if (megaphoneEpisode) {
                         const originalAudioDuration = await getAudioDuration(originalAudio.url);
                         const megaphoneAudioStream = await getAudioDuration(megaphoneEpisode.downloadUrl);
@@ -36,6 +36,10 @@ module.exports = (programSlug) => {
                         // If the difference is above the threshold, and an audio file isn't already being processed, then reupload
                         if (difference > differenceThreshold && megaphoneEpisode.audioFileProcessing === false) {
                             resolve(reuploadAudio(megaphoneEpisode, originalAudio.url));
+                        // If an audio file is still being processed
+                        } else if (megaphoneEpisode.audioFileProcess === true) {
+                            resolve({ status: `${programSlug}'s audio file upload is still processing`});
+                        // Otherwise, this audio file is probably within the expected range
                         } else {
                             resolve({ status: `${programSlug}'s audio file is within an expected range`});
                         }
