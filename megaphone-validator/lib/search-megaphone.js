@@ -14,7 +14,7 @@ module.exports = (externalId) => {
         }
 
         request(options, (error, response, body) => {
-            if (error) reject(error)
+            if (error) reject(error);
             else if (body && body.length > 0) {
                 const episode = body[0];
                 resolve(episode);
