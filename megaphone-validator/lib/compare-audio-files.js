@@ -4,6 +4,8 @@ const getAudioDuration = require('./get-audio-duration');
 const reuploadAudio = require('./reupload-audio');
 const searchForMegaphoneEpisodes = require('./search-megaphone');
 
+require('dotenv').config();
+
 const differenceThreshold = parseInt(process.env.DIFFERENCE_THRESHOLD) || 6;
 
 module.exports = (programSlug) => {
@@ -28,16 +30,23 @@ module.exports = (programSlug) => {
                     // If there is a megaphone episode
                     if (megaphoneEpisode) {
                         const originalAudioDuration = await getAudioDuration(originalAudio.url);
-
                         const megaphoneAudioStream = await getAudioDuration(megaphoneEpisode.downloadUrl);
                         const difference = Math.abs(megaphoneAudioStream - originalAudioDuration);
 
                         // If the difference is above the threshold, and an audio file isn't already being processed, then reupload
                         if (difference > differenceThreshold && megaphoneEpisode.audioFileProcessing === false) {
                             resolve(reuploadAudio(megaphoneEpisode, originalAudio.url));
+                        } else {
+                            resolve({ status: `${programSlug}'s audio file is within an expected range`});
                         }
+                    } else {
+                        resolve({ status: `${programSlug} doesn't have an equivalent megaphone episode yet`});
                     }
+                } else {
+                    resolve({ status: `${programSlug} doesn't have an an audio file attached yet`});
                 }
+            } else {
+                resolve({ status: `${programSlug} doesn't have an episode published yet`});
             }
         });
     });

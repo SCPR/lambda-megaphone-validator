@@ -1,5 +1,7 @@
 const request = require('request');
 
+require('dotenv').config();
+
 const authorizationHeader = {
     Authorization: `Token token=${process.env.MEGAPHONE_AUTH_TOKEN}`
 }

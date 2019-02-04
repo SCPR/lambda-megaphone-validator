@@ -1,5 +1,7 @@
 const request = require('request');
 
+require('dotenv').config();
+
 const authorizationHeader = {
     Authorization: `Token token=${process.env.MEGAPHONE_AUTH_TOKEN}`
 }
@@ -21,8 +23,6 @@ module.exports = (megaphoneEpisode, audioUrl) => {
 
         request(options, (err, response, body) => {
             if (err) reject(err);
-            console.log(body);
-            console.log(body.audioFileProcessing);
             resolve(body);
         });
     });
