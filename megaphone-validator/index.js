@@ -59,17 +59,17 @@ const reuploadAudio = (megaphoneEpisode, audioUrl) => {
     });
 }
 
-const getLatestEpisodes = () => {
-    // Exit if there are no podcasts indicated
+exports.handler = (event, context, callback) => {
+    // Exit if there are no podcasts indicated in the env
     if (!programSlugString) {
         return false;
     }
 
+    // Get each slug and check for today's episode
     const programSlugArray = programSlugString.split(',');
 
     programSlugArray.forEach((programSlug) => {
-        // const todaysDate = new Date().toISOString().slice(0,10);
-        const todaysDate = "2019-01-25"
+        const todaysDate = new Date().toISOString().slice(0,10);
         const options = {
             json: true,
             method: 'GET',
@@ -81,24 +81,25 @@ const getLatestEpisodes = () => {
             if (body && body.episodes && body.episodes.length > 0) {
                 const episode = body.episodes[0];
                 const externalId = `${episode.id}__production`
+                // If the most recent episode has at least one audio file, take it and then check if Megaphone has it
                 if (episode.audio.length > 0) {
                     const originalAudio = episode.audio[0];
                     const megaphoneEpisode = await searchForMegaphoneEpisodes(externalId);
-                    const originalAudioDuration = await getAudioDuration(originalAudio.url);
-                    const megaphoneAudioStream = await getAudioDuration(megaphoneEpisode.downloadUrl);
-                    const difference = Math.abs(megaphoneAudioStream - originalAudioDuration);
-                    console.log({ originalAudio: originalAudio.url, megaphoneAudio: megaphoneEpisode.downloadUrl, difference });
 
-                    // If the difference is above the threshold, reupload
-                    if (difference > differenceThreshold) {
-                        reuploadAudio(megaphoneEpisode, originalAudio.url);
+                    // If there is a megaphone episode
+                    if (megaphoneEpisode) {
+                        const originalAudioDuration = await getAudioDuration(originalAudio.url);
+
+                        const megaphoneAudioStream = await getAudioDuration(megaphoneEpisode.downloadUrl);
+                        const difference = Math.abs(megaphoneAudioStream - originalAudioDuration);
+
+                        // If the difference is above the threshold, and an audio file isn't already being processed, then reupload
+                        if (difference > differenceThreshold && megaphoneEpisode.audioFileProcessing === false) {
+                            reuploadAudio(megaphoneEpisode, originalAudio.url);
+                        }
                     }
                 }
             }
         });
     });
-
-}
-
-getLatestEpisodes();
-
+};
