@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/arellaTV/lambda-megaphone-validator.git"
+    "url": "git+https://github.com/SCPR/lambda-megaphone-validator.git"
   },
   "author": "Jay Arella",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/arellaTV/lambda-megaphone-validator/issues"
+    "url": "https://github.com/SCPR/lambda-megaphone-validator/issues"
   },
-  "homepage": "https://github.com/arellaTV/lambda-megaphone-validator#readme",
+  "homepage": "https://github.com/SCPR/lambda-megaphone-validator#readme",
   "dependencies": {
     "dotenv": "^6.2.0",
     "music-metadata": "^3.5.1",

@@ -3,14 +3,16 @@ const compareAudioFiles = require('./lib/compare-audio-files');
 // Load environment variables
 require('dotenv').config();
 
+const megaphoneAuthToken = process.env.MEGAPHONE_AUTH_TOKEN;
+const megaphoneNetworkId = process.env.MEGAPHONE_NETWORK_ID;
 const programSlugString = process.env.SCPR_PROGRAM_SLUGS || '';
 
 exports.handler = (event, context, callback) => {
     // Stops executing when the callback is fired.
     context.callbackWaitsForEmptyEventLoop = false;
 
-    // Exit if there are no podcasts indicated in the env
-    if (!programSlugString) {
+    // Exit if there are missing env variables that are required
+    if (programSlugString || !megaphoneAuthToken || !megaphoneNetworkId) {
         return false;
     }
 
