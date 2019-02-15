@@ -23,7 +23,7 @@ module.exports = (megaphoneEpisode, audioUrl) => {
 
         request(options, (error, response, body) => {
             if (error) reject({ level: "ERROR", message: error });
-            resolve({ level: "REUPLOADED", message: `${programSlug}'s audio file was reuploaded`, body });
+            resolve({ level: "WARNING", message: `${programSlug}'s audio file was reuploaded`, body });
         });
     });
 };
