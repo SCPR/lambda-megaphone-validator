@@ -10,15 +10,20 @@ const differenceThreshold = parseInt(process.env.DIFFERENCE_THRESHOLD) || 6;
 
 module.exports = (programSlug) => {
     return new Promise((resolve, reject) => {
-        const todaysDate = new Date().toISOString().slice(0,10);
+        const date = new Date();
+        const utcDate = new Date(date.toUTCString());
+        utcDate.setHours(utcDate.getHours()-8);
+        const todaysDate = new Date(utcDate);
+        const todaysDateString = todaysDate.toISOString().slice(0,10);
+
         const options = {
             json: true,
             method: 'GET',
-            url: `https://scpr.org/api/v3/episodes?program=${programSlug}&air_date=${todaysDate}`,
+            url: `https://scpr.org/api/v3/episodes?program=${programSlug}&air_date=${todaysDateString}`,
         }
 
         request(options, async (error, response, body) => {
-            if (error) reject(error)
+            if (error) reject({ level: "ERROR", message: error })
             if (body && body.episodes && body.episodes.length > 0) {
                 const episode = body.episodes[0];
                 const externalId = `${episode.id}__production`
@@ -30,7 +35,7 @@ module.exports = (programSlug) => {
                     // If there is a megaphone episode, check the difference in duration between both files
                     if (megaphoneEpisode) {
                         const originalAudioDuration = await getAudioDuration(originalAudio.url);
-                        const megaphoneAudioStream = await getAudioDuration(megaphoneEpisode.downloadUrl);
+                        const megaphoneAudioStream = await getAudioDuration(megaphoneEpisode.audioFile);
                         const difference = Math.abs(megaphoneAudioStream - originalAudioDuration);
 
                         // If the difference is above the threshold, and an audio file isn't already being processed, then reupload
@@ -38,19 +43,19 @@ module.exports = (programSlug) => {
                             resolve(reuploadAudio(megaphoneEpisode, originalAudio.url));
                         // If an audio file is still being processed
                         } else if (megaphoneEpisode.audioFileProcess === true) {
-                            resolve({ status: `${programSlug}'s audio file upload is still processing`});
+                            resolve({ level: "INFO", message: `${programSlug}'s audio file upload is still processing`});
                         // Otherwise, this audio file is probably within the expected range
                         } else {
-                            resolve({ status: `${programSlug}'s audio file is within an expected range`});
+                            resolve({ level: "INFO", message: `${programSlug}'s audio file is within an expected range`});
                         }
                     } else {
-                        resolve({ status: `${programSlug} doesn't have an equivalent megaphone episode yet`});
+                        resolve({ level: "INFO", message: `${programSlug} doesn't have an equivalent megaphone episode yet`});
                     }
                 } else {
-                    resolve({ status: `${programSlug} doesn't have an an audio file attached yet`});
+                    resolve({ level: "INFO", message: `${programSlug} doesn't have an an audio file attached yet`});
                 }
             } else {
-                resolve({ status: `${programSlug} doesn't have an episode published yet`});
+                resolve({ level: "INFO", message: `${programSlug} doesn't have an episode published yet`});
             }
         });
     });

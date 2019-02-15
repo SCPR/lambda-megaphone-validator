@@ -12,7 +12,7 @@ exports.handler = (event, context, callback) => {
     context.callbackWaitsForEmptyEventLoop = false;
 
     // Exit if there are missing env variables that are required
-    if (programSlugString || !megaphoneAuthToken || !megaphoneNetworkId) {
+    if (!programSlugString || !megaphoneAuthToken || !megaphoneNetworkId) {
         return false;
     }
 
@@ -23,19 +23,25 @@ exports.handler = (event, context, callback) => {
     // After each pair of audio files have been compared, log the results or catch any errors
     Promise.all(compareAllAudioFiles)
         .then((results) => {
+            const resultArray = results || [];
+
+            resultArray.forEach((resultObject) => {
+                // Log each result object on a separate line
+                console.log(JSON.stringify(resultObject));
+            });
+
             const response = {
                 statusCode: 200,
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(results)
-            }
+                body: JSON.stringify({ level: "INFO", message: "Finished."})
+            };
 
-            console.log(response);
             callback(null, response);
         })
-        .catch((err) => {
-            console.log({err});
-            callback(err);
+        .catch((error) => {
+            console.log(JSON.stringify({ level: "ERROR", message: error }));
+            callback(error);
         })
 };

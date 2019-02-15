@@ -21,9 +21,9 @@ module.exports = (megaphoneEpisode, audioUrl) => {
             url: `https://cms.megaphone.fm/api/networks/${networkId}/podcasts/${podcastId}/episodes/${episodeId}`,
         };
 
-        request(options, (err, response, body) => {
-            if (err) reject(err);
-            resolve(body);
+        request(options, (error, response, body) => {
+            if (error) reject({ level: "ERROR", message: error });
+            resolve({ level: "REUPLOADED", message: `${programSlug}'s audio file was reuploaded`, body });
         });
     });
 };
